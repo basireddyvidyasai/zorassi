@@ -20,25 +20,30 @@ const Register = ({ onRegister, onSwitch }) => {
 
   return (
     <div className="auth-wrapper">
-      <div className="glass-card auth-box">
-        <h1 className="title" style={{ textAlign: 'center' }}>Sign Up</h1>
-        {error && <p className="text-danger" style={{ marginBottom: '1rem', textAlign: 'center' }}>{error}</p>}
+      <div className="premium-card">
+        <h1 className="auth-title">Join Us</h1>
+        <p className="auth-subtitle">Create your account to start managing your finances</p>
+        
+        {error && <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>{error}</div>}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Name</label>
+            <label>Full Name</label>
             <input 
               type="text" 
               className="form-control" 
+              placeholder="John Doe"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required 
             />
           </div>
           <div className="form-group">
-            <label>Email</label>
+            <label>Email Address</label>
             <input 
               type="email" 
               className="form-control" 
+              placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
@@ -49,22 +54,26 @@ const Register = ({ onRegister, onSwitch }) => {
             <input 
               type="password" 
               className="form-control" 
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
             />
           </div>
-        <button type="submit" className="btn btn-primary" style={{ marginBottom: '1rem' }}>Sign Up</button>
           
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+          <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', marginBottom: '1.5rem', height: '48px', fontSize: '1.1rem' }}>
+            Create Account
+          </button>
+          
+          <div style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
             Already have an account?{' '}
             <span 
               onClick={onSwitch} 
-              style={{ color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }}
             >
-              Log in
+              Sign in instead
             </span>
-          </p>
+          </div>
         </form>
       </div>
     </div>

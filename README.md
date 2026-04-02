@@ -60,9 +60,33 @@ A full-stack financial management system built with Node.js, Express, MongoDB, a
 - **Predefined Categories**: Using a fixed list (Salary, Food, Rent, etc.) for data consistency.
 - **Soft Delete**: Default deletion of records preserves data integrity for auditing.
 
-## ⚙️ Tradeoffs Considered
+## ⚙️ Technical Decisions and Trade-offs
 
-- **Soft Delete vs. Hard Delete**: Chose soft delete for records to prevent data loss while implementing hard delete for users to satisfy privacy requirements.
-- **Real-time Aggregation**: Used MongoDB aggregation pipelines on the server instead of client-side filtering to ensure high performance with large datasets.
-- **Vanilla CSS over Tailwind**: Selected Vanilla CSS for complete design control and to avoid build-time complexities for this specific evaluation.
-- **Vite over CRA**: Used Vite for significantly faster development cycles and HMR support.
+### 🛠️ Framework & Technology Choice
+- **Frontend (React + Vite)**: Chosen for its exceptional speed and developer experience. Compared to Create React App (CRA), **Vite** offers significantly faster build times and Hot Module Replacement (HMR).
+- **Backend (Node.js + Express)**: A lightweight, non-blocking foundation that is perfect for real-time dashboards and JSON-heavy APIs.
+- **Trade-off**: While Next.js could provide Server Side Rendering (SSR), it was passed over for a **Vite SPA** (Single Page App) to keep the frontend/backend decoupled, making it easier to deploy the backend to serverless platforms in the future.
+
+### 🗄️ Database Strategy (MongoDB + Mongoose)
+- **Choice**: Document-oriented NoSQL.
+- **Why**: Financial records can vary (additional meta-data, tags, etc.). MongoDB's flexible schema allows the app to evolve without complex SQL migrations.
+- **Trade-off**: SQL would provide better transactional integrity (ACID), but for a personal finance dashboard, the **speed and flexibility** of MongoDB outweigh the need for strict relational constraints.
+
+### 🔐 Authentication Approach (JWT)
+- **Choice**: Stateless JWT (JSON Web Tokens).
+- **Why**: Simplifies deployment and scaling as the server does not need to store session data. It is the modern standard for secure, decoupled API communication.
+- **Trade-off**: JWTs cannot be easily "revoked" before they expire. To mitigate this, I implemented an **account status ('inactive')** check on every request to ensure deactivated users are instantly blocked.
+
+### 🏗️ Project Architecture
+- **Pattern**: Controller-Route-Middleware.
+- **Why**: Clean separation of concerns.
+  - **Routes**: Define endpoints.
+  - **Controllers**: Handle business logic.
+  - **Middleware**: Manages reusable cross-cutting concerns (Auth, Validation, Error Handling).
+- **Trade-off**: For a small app, this adds more files, but it ensures the project remains **maintainable and testable** as it grows.
+
+---
+
+### 💡 Final Considerations
+- **Soft Delete**: Records are never hard-deleted; they are flagged (`isDeleted: true`). This maintains financial auditability while allowing a "Restore" feature in the future.
+- **Server-side Aggregation**: Calculations for "Monthly Trends" are handled by MongoDB aggregation pipelines. This offloads heavy processing from the client’s browser to the server.

@@ -9,8 +9,8 @@
   --danger: #ef4444;
   --text: #f8fafc;
   --text-muted: #94a3b8;
-  --border: #334155;
-  --radius: 12px;
+  --border: rgba(255, 255, 255, 0.1);
+  --radius: 16px;
 }
 
 * {
@@ -112,11 +112,58 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  background: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(167, 139, 250, 0.15) 0, transparent 50%),
+              radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0, transparent 50%),
+              radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.15) 0, transparent 50%);
+  background-color: var(--bg);
+  position: relative;
+  overflow: hidden;
 }
 
-.auth-box {
+.auth-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: url("https://www.transparenttextures.com/patterns/cubes.png");
+  opacity: 0.03;
+}
+
+.premium-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 3rem 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: white;
+  letter-spacing: -0.025em;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+  font-size: 1rem;
 }
 
 .header {

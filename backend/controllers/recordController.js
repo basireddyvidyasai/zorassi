@@ -22,6 +22,7 @@ const createRecord = async (req, res) => {
 
 const getRecords = async (req, res) => {
   try {
+    console.log('Query received:', req.query);
     const { type, category, search, startDate, endDate, page = 1, limit = 10, sort = 'desc' } = req.query;
     const query = { isDeleted: false };
     if (type) query.type = type;

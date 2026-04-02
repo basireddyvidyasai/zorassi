@@ -50,7 +50,13 @@ const getSummary = async (req, res) => {
       netBalance,
       categoryTotals,
       recentActivity,
-      monthlyTrends
+      monthlyTrends,
+      currentUser: {
+        _id: req.user._id,
+        name: req.user.name,
+        role: req.user.role,
+        status: req.user.status
+      }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

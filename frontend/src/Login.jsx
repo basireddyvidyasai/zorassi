@@ -18,41 +18,52 @@ const Login = ({ onLogin, onSwitch }) => {
 
   return (
     <div className="auth-wrapper">
-      <div className="glass-card auth-box">
-        <h1 className="title" style={{ textAlign: 'center' }}>Sign In</h1>
-        {error && <p className="text-danger" style={{ marginBottom: '1rem', textAlign: 'center' }}>{error}</p>}
+      <div className="premium-card">
+        <h1 className="auth-title">Welcome Back</h1>
+        <p className="auth-subtitle">Enter your credentials to access your dashboard</p>
+        
+        {error && <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>{error}</div>}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label>Email Address</label>
             <input 
               type="email" 
               className="form-control" 
+              placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
             />
           </div>
           <div className="form-group">
-            <label>Password</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label style={{ margin: 0 }}>Password</label>
+              <span style={{ fontSize: '0.8rem', color: 'var(--primary)', cursor: 'pointer' }}>Forgot password?</span>
+            </div>
             <input 
               type="password" 
               className="form-control" 
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
             />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ marginBottom: '1rem' }}>Login</button>
           
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-            Don't have an account?{' '}
+          <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', marginBottom: '1.5rem', height: '48px', fontSize: '1.1rem' }}>
+            Sign In
+          </button>
+          
+          <div style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+            Don't have an account yet?{' '}
             <span 
               onClick={onSwitch} 
-              style={{ color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ color: 'white', fontWeight: 600, cursor: 'pointer', borderBottom: '1px solid var(--primary)' }}
             >
-              Sign up
+              Create an account
             </span>
-          </p>
+          </div>
         </form>
       </div>
     </div>

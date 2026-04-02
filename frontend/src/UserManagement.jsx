@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const UserManagement = ({ token }) => {
+const UserManagement = ({ token, currentUser, onUserUpdate }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -26,6 +26,12 @@ const UserManagement = ({ token }) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       await axios.put(`http://localhost:5000/api/auth/${id}`, data, config);
+      
+      // If the current user updated their own role or status, sync it immediately
+      if (id === currentUser._id && onUserUpdate) {
+        onUserUpdate(data);
+      }
+
       fetchUsers();
     } catch (err) {
       alert('Update failed');

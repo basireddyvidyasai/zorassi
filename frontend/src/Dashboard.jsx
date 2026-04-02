@@ -3,7 +3,7 @@ import axios from 'axios';
 import RecordForm from './RecordForm';
 import UserManagement from './UserManagement';
 
-const Dashboard = ({ token, user, onLogout }) => {
+const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
   const [summary, setSummary] = useState(null);
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
@@ -22,8 +22,18 @@ const Dashboard = ({ token, user, onLogout }) => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const sumRes = await axios.get('http://localhost:5000/api/dashboard/summary', config);
       setSummary(sumRes.data);
+      
+      // Auto-sync user role/status if backend reports a change
+      if (sumRes.data.currentUser) {
+        const { role, status, name } = sumRes.data.currentUser;
+        if (role !== user.role || status !== user.status || name !== user.name) {
+          onUserUpdate({ role, status, name });
+        }
+      }
+
       if (user.role !== 'Viewer') {
         const query = new URLSearchParams({ ...filters, page }).toString();
+        console.log('Fetching records with query:', query);
         const recRes = await axios.get(`http://localhost:5000/api/records?${query}`, config);
         setRecords(recRes.data.records);
         setTotalPages(recRes.data.pages);
@@ -141,7 +151,7 @@ const Dashboard = ({ token, user, onLogout }) => {
       )}
 
       {view === 'users' && user.role === 'Admin' ? (
-        <UserManagement token={token} />
+        <UserManagement token={token} currentUser={user} onUserUpdate={onUserUpdate} />
       ) : (
         <>
           {user.role === 'Admin' && (
