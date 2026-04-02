@@ -32,7 +32,10 @@ const getRecords = async (req, res) => {
     }
     const skip = (page - 1) * limit;
     const sortOrder = sort === 'asc' ? 1 : -1;
-    const records = await Record.find(query).skip(skip).limit(parseInt(limit)).sort({ date: sortOrder });
+    const records = await Record.find(query)
+      .sort({ date: sortOrder, createdAt: sortOrder })
+      .skip(skip)
+      .limit(parseInt(limit));
     const total = await Record.countDocuments(query);
     res.json({ records, total, page: parseInt(page), pages: Math.ceil(total / limit) });
   } catch (error) {
