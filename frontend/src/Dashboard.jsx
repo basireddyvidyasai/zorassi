@@ -8,7 +8,7 @@ const Dashboard = ({ token, user, onLogout }) => {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filters, setFilters] = useState({ type: '', category: '', search: '' });
+  const [filters, setFilters] = useState({ type: '', category: '', search: '', sort: 'desc' });
   const [editingRecord, setEditingRecord] = useState(null);
   const [view, setView] = useState('records'); // 'records' or 'users'
 
@@ -187,6 +187,15 @@ const Dashboard = ({ token, user, onLogout }) => {
                     {categories.map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
+                  </select>
+                  <select 
+                    className="form-control" 
+                    style={{ width: 'auto' }}
+                    value={filters.sort}
+                    onChange={(e) => setFilters({...filters, sort: e.target.value})}
+                  >
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
                   </select>
                 </div>
               </div>

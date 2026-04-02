@@ -22,7 +22,7 @@ const createRecord = async (req, res) => {
 
 const getRecords = async (req, res) => {
   try {
-    const { type, category, search, startDate, endDate, page = 1, limit = 10 } = req.query;
+    const { type, category, search, startDate, endDate, page = 1, limit = 10, sort = 'desc' } = req.query;
     const query = { isDeleted: false };
     if (type) query.type = type;
     if (category) query.category = category;
@@ -31,7 +31,8 @@ const getRecords = async (req, res) => {
       query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
     }
     const skip = (page - 1) * limit;
-    const records = await Record.find(query).skip(skip).limit(parseInt(limit)).sort({ date: -1 });
+    const sortOrder = sort === 'asc' ? 1 : -1;
+    const records = await Record.find(query).skip(skip).limit(parseInt(limit)).sort({ date: sortOrder });
     const total = await Record.countDocuments(query);
     res.json({ records, total, page: parseInt(page), pages: Math.ceil(total / limit) });
   } catch (error) {
