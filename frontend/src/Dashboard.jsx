@@ -194,8 +194,8 @@ const Dashboard = ({ token, user, onLogout }) => {
                     value={filters.sort}
                     onChange={(e) => setFilters({...filters, sort: e.target.value})}
                   >
-                    <option value="desc">Newest First</option>
-                    <option value="asc">Oldest First</option>
+                    <option value="desc">Sort by Date (Newest)</option>
+                    <option value="asc">Sort by Date (Oldest)</option>
                   </select>
                 </div>
               </div>
