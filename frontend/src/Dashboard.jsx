@@ -1,7 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  PointElement,
+  LineElement,
+} from 'chart.js';
+import { Doughnut, Bar } from 'react-chartjs-2';
 import RecordForm from './RecordForm';
 import UserManagement from './UserManagement';
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  PointElement,
+  LineElement
+);
 
 const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
   const [summary, setSummary] = useState(null);
@@ -10,7 +35,7 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({ type: '', category: '', search: '', sort: 'desc' });
   const [editingRecord, setEditingRecord] = useState(null);
-  const [view, setView] = useState('records'); // 'records' or 'users'
+  const [view, setView] = useState(user.role === 'Viewer' ? 'analytics' : 'records'); // 'records', 'analytics', or 'users'
 
   const categories = [
     'Salary', 'Food', 'Rent', 'Utilities', 'Entertainment', 
@@ -45,6 +70,9 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
 
   useEffect(() => {
     fetchData();
+    // Background polling for role/status changes and live data updates every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, [token, user, filters, page]);
 
   // Rest of the component...
@@ -80,80 +108,137 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
           <h1 className="title" style={{ marginBottom: 0 }}>Finance Dashboard</h1>
           <p style={{ color: 'var(--text-muted)' }}>Welcome back, {user.name} ({user.role})</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          {user.role === 'Admin' && (
+        
+        <div className="nav-bar">
+          {user.role !== 'Viewer' && (
             <button 
-              onClick={() => setView(view === 'records' ? 'users' : 'records')} 
-              className="btn" 
-              style={{ width: 'auto', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: 'white' }}
+              className={`nav-link ${view === 'records' ? 'active' : ''}`}
+              onClick={() => setView('records')}
             >
-              {view === 'records' ? 'Manage Users' : 'Manage Records'}
+              Dashboard
             </button>
           )}
-          <button onClick={onLogout} className="btn btn-primary" style={{ width: 'auto' }}>Logout</button>
+          <button 
+            className={`nav-link ${view === 'analytics' ? 'active' : ''}`}
+            onClick={() => setView('analytics')}
+          >
+            Analytics
+          </button>
+          {user.role === 'Admin' && (
+            <button 
+              className={`nav-link ${view === 'users' ? 'active' : ''}`}
+              onClick={() => setView('users')}
+            >
+              Manage Users
+            </button>
+          )}
         </div>
+
+        <button onClick={onLogout} className="btn btn-primary" style={{ width: 'auto' }}>Logout</button>
       </header>
 
-      {summary && (
-        <>
+      {view === 'analytics' && summary && (
+        <div key="analytics-view" style={{ animation: 'slideUp 0.4s ease' }}>
           <div className="stats-grid">
-            <div className="stat-card">
+            <div className="stat-card" style={{ borderLeft: '4px solid var(--success)' }}>
               <span className="stat-label">Total Income</span>
               <span className="stat-value text-success">${summary.totalIncome.toLocaleString()}</span>
+              <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                +{((summary.totalIncome / (summary.totalExpenses || 1)) * 10).toFixed(1)}% vs expenses
+              </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card" style={{ borderLeft: '4px solid var(--danger)' }}>
               <span className="stat-label">Total Expenses</span>
               <span className="stat-value text-danger">${summary.totalExpenses.toLocaleString()}</span>
+              <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {((summary.totalExpenses / (summary.totalIncome || 1)) * 100).toFixed(1)}% of income
+              </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card" style={{ borderLeft: '4px solid var(--primary)' }}>
               <span className="stat-label">Net Balance</span>
               <span className="stat-value text-primary">${summary.netBalance.toLocaleString()}</span>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-            <div className="glass-card">
-              <h3 style={{ marginBottom: '1rem' }}>Category Breakdown</h3>
-              {Object.entries(summary.categoryTotals).map(([cat, val]) => (
-                <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span>{cat}</span>
-                  <span style={{ fontWeight: 600 }}>${val.toLocaleString()}</span>
-                </div>
-              ))}
-              {Object.keys(summary.categoryTotals).length === 0 && <p className="text-muted">No data yet</p>}
-            </div>
-            <div className="glass-card">
-              <h3 style={{ marginBottom: '1rem' }}>Monthly Trends ({new Date().getFullYear()})</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {[...new Array(12)].map((_, i) => {
-                  const monthNum = i + 1;
-                  const monthData = (summary.monthlyTrends || []).filter(t => t._id.month === monthNum);
-                  const inc = monthData.find(d => d._id.type === 'income')?.total || 0;
-                  const exp = monthData.find(d => d._id.type === 'expense')?.total || 0;
-                  if (inc === 0 && exp === 0) return null;
-                  return (
-                    <div key={monthNum} style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)' }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                        {new Date(0, i).toLocaleString('default', { month: 'short' })}
-                      </div>
-                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem' }}>
-                        <span className="text-success">In: ${inc.toLocaleString()}</span>
-                        <span className="text-danger">Out: ${exp.toLocaleString()}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-                {(!summary.monthlyTrends || summary.monthlyTrends.length === 0) && <p className="text-muted">No trend data yet</p>}
+              <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Current liquid assets
               </div>
             </div>
           </div>
-        </>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="glass-card">
+              <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem', fontWeight: 600 }}>Category Allocation</h3>
+              <div className="chart-container">
+                <Doughnut 
+                  data={{
+                    labels: Object.keys(summary.categoryTotals),
+                    datasets: [{
+                      data: Object.values(summary.categoryTotals),
+                      backgroundColor: [
+                        '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', 
+                        '#ec4899', '#06b6d4', '#f97316', '#14b8a6', '#64748b'
+                      ],
+                      borderWidth: 0,
+                      hoverOffset: 15
+                    }]
+                  }}
+                  options={{
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'right',
+                        labels: { color: '#94a3b8', font: { size: 11 }, usePointStyle: true, padding: 15 }
+                      }
+                    },
+                    cutout: '70%'
+                  }}
+                />
+              </div>
+            </div>
+            <div className="glass-card">
+              <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem', fontWeight: 600 }}>Monthly Performance</h3>
+              <div className="chart-container">
+                <Bar 
+                  data={{
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                      {
+                        label: 'Income',
+                        data: [...new Array(12)].map((_, i) => {
+                          const monthData = (summary.monthlyTrends || []).find(t => t._id.month === i + 1 && t._id.type === 'income');
+                          return monthData ? monthData.total : 0;
+                        }),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderRadius: 4
+                      },
+                      {
+                        label: 'Expense',
+                        data: [...new Array(12)].map((_, i) => {
+                          const monthData = (summary.monthlyTrends || []).find(t => t._id.month === i + 1 && t._id.type === 'expense');
+                          return monthData ? monthData.total : 0;
+                        }),
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderRadius: 4
+                      }
+                    ]
+                  }}
+                  options={{
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: { position: 'top', labels: { color: '#94a3b8', boxWidth: 12, usePointStyle: true } }
+                    },
+                    scales: {
+                      x: { grid: { display: false }, ticks: { color: '#64748b' } },
+                      y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b' } }
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
-      {view === 'users' && user.role === 'Admin' ? (
-        <UserManagement token={token} currentUser={user} onUserUpdate={onUserUpdate} />
-      ) : (
-        <>
+      {view === 'records' && (
+        <div key="records-view" style={{ animation: 'slideUp 0.4s ease' }}>
           {user.role === 'Admin' && (
             <RecordForm 
               token={token} 
@@ -290,7 +375,13 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
               </div>
             </div>
           )}
-        </>
+        </div>
+      )}
+
+      {view === 'users' && user.role === 'Admin' && (
+        <div key="users-view" style={{ animation: 'slideUp 0.4s ease' }}>
+          <UserManagement token={token} currentUser={user} onUserUpdate={onUserUpdate} />
+        </div>
       )}
     </div>
   );

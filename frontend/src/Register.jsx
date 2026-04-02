@@ -5,13 +5,12 @@ const Register = ({ onRegister, onSwitch }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Viewer');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', { name, email, password, role });
+      const res = await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
       onRegister(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
@@ -22,7 +21,6 @@ const Register = ({ onRegister, onSwitch }) => {
     <div className="auth-wrapper">
       <div className="premium-card">
         <h1 className="auth-title">Join Us</h1>
-        <p className="auth-subtitle">Create your account to start managing your finances</p>
         
         {error && <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>{error}</div>}
         
