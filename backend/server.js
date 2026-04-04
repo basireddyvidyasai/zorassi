@@ -20,18 +20,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error' });
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-      app.listen(process.env.PORT || 5000, () => {
-        console.log('Started');
-      });
-    })
-    .catch((err) => {
-      console.log(err);
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    app.listen(process.env.PORT || 5000, () => {
+      console.log('Server started on port', process.env.PORT || 5000);
     });
-} else {
-  mongoose.connect(process.env.MONGODB_URI);
-}
+  })
+  .catch((err) => {
+    console.log('MongoDB connection error:', err);
+  });
 
 module.exports = app;
