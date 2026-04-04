@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -45,7 +45,7 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
   const fetchData = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const sumRes = await axios.get('http://localhost:5000/api/dashboard/summary', config);
+      const sumRes = await api.get('/dashboard/summary', config);
       setSummary(sumRes.data);
       
       // Auto-sync user role/status if backend reports a change
@@ -59,7 +59,7 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
       if (user.role !== 'Viewer') {
         const query = new URLSearchParams({ ...filters, page }).toString();
         console.log('Fetching records with query:', query);
-        const recRes = await axios.get(`http://localhost:5000/api/records?${query}`, config);
+        const recRes = await api.get(`/records?${query}`, config);
         setRecords(recRes.data.records);
         setTotalPages(recRes.data.pages);
       }
@@ -82,7 +82,7 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
     if (!window.confirm('Delete this record?')) return;
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/records/${id}`, config);
+      await api.delete(`/records/${id}`, config);
       alert('Record deleted successfully');
       fetchData();
     } catch (err) {
@@ -93,7 +93,7 @@ const Dashboard = ({ token, user, onLogout, onUserUpdate }) => {
   const handleUpdate = async (id, updatedData) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`http://localhost:5000/api/records/${id}`, updatedData, config);
+      await api.put(`/records/${id}`, updatedData, config);
       setEditingRecord(null);
       fetchData();
     } catch (err) {

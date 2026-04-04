@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from './api';
 
 const Login = ({ onLogin, onSwitch }) => {
   const [email, setEmail] = useState('');
@@ -9,7 +9,7 @@ const Login = ({ onLogin, onSwitch }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       onLogin(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

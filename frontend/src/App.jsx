@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api';
 import Login from './Login';
 import Register from './Register';
 import Dashboard from './Dashboard';
@@ -17,7 +17,7 @@ const App = () => {
       if (user && user.token) {
         try {
           const config = { headers: { Authorization: `Bearer ${user.token}` } };
-          const res = await axios.get('http://localhost:5000/api/auth/me', config);
+          const res = await api.get('/auth/me', config);
           const updatedUser = { ...user, ...res.data };
           localStorage.setItem('user', JSON.stringify(updatedUser));
           setUser(updatedUser);

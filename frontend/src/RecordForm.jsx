@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api';
 
 const RecordForm = ({ token, onRecordAdded, editingRecord, onCancelEdit, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -45,7 +45,7 @@ const RecordForm = ({ token, onRecordAdded, editingRecord, onCancelEdit, onUpdat
         await onUpdate(editingRecord._id, formData);
       } else {
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.post('http://localhost:5000/api/records', formData, config);
+        await api.post('/records', formData, config);
         setFormData({
           amount: '',
           type: 'expense',

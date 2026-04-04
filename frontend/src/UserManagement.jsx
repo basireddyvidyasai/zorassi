@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api';
 
 const UserManagement = ({ token, currentUser, onUserUpdate }) => {
   const [users, setUsers] = useState([]);
@@ -9,7 +9,7 @@ const UserManagement = ({ token, currentUser, onUserUpdate }) => {
     setLoading(true);
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get('http://localhost:5000/api/auth', config);
+      const res = await api.get('/auth', config);
       setUsers(res.data);
     } catch (err) {
       console.error('Failed to fetch users');
@@ -25,7 +25,7 @@ const UserManagement = ({ token, currentUser, onUserUpdate }) => {
   const handleUpdate = async (id, data) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`http://localhost:5000/api/auth/${id}`, data, config);
+      await api.put(`/auth/${id}`, data, config);
       
       // If the current user updated their own role or status, sync it immediately
       if (id === currentUser._id && onUserUpdate) {
@@ -42,7 +42,7 @@ const UserManagement = ({ token, currentUser, onUserUpdate }) => {
     if (!window.confirm('Delete this user permanently? This cannot be undone.')) return;
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/auth/${id}`, config);
+      await api.delete(`/auth/${id}`, config);
       alert('User deleted successfully');
       fetchUsers();
     } catch (err) {
