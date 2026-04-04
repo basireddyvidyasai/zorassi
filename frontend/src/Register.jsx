@@ -13,7 +13,8 @@ const Register = ({ onRegister, onSwitch }) => {
       const res = await api.post('/auth/register', { name, email, password });
       onRegister(res.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const debugInfo = `Failed to connect! Base URL is: ${api.defaults.baseURL || 'undefined'}. Error: ${err.message}. Response: ${err.response?.data?.message || 'None'}`;
+      setError(debugInfo);
     }
   };
 
