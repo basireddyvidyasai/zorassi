@@ -1,92 +1,130 @@
-# Professional Finance Dashboard
+<div align="center">
+  
+# 📊 Professional Finance Dashboard
 
-A full-stack financial management system built with Node.js, Express, MongoDB, and React.
+[![React](https://img.shields.io/badge/React-19.2.4-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4.21-646CFF.svg?style=for-the-badge&logo=vite)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-Backend-green.svg?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.2.1-lightgrey.svg?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248.svg?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+
+*A full-stack, comprehensive financial management system built to track income, expenses, and overall balance with Role-Based Access Control.*
+
+</div>
+
+---
 
 > [!IMPORTANT]
 > **Automated Role Security**:
 > - The **very first user** to register is automatically granted the **Admin** role.
 > - **All subsequent users** default to the **Viewer** role.
-> - Admins can manually promote users to analyst,admin and viewer via the User Management panel.
-
-## 🚀 Setup Instructions
-
-### 1. Backend Setup
-1.  Navigate to `/backend`
-2.  Install dependencies: `npm install`
-3.  Configure `.env` file:
-    ```env
-    PORT=5000
-    MONGODB_URI=<YOUR_MONGODB_URI>
-    JWT_SECRET=<YOUR_JWT_SECRET>
-    ```
-4.  Run Server: `npm start`
-
-### 2. Frontend Setup
-1.  Navigate to `/frontend`
-2.  Install dependencies: `npm install`
-3.  Run Dev Server: `npm run dev`
+> - Admins can manually promote users to `Analyst`, `Admin` or `Viewer` via the User Management panel.
 
 ## ✨ Core Features
 
-- **Authentication**: Secure JWT-based login and registration.
-- **RBAC**: Three roles: `Viewer` (read-only), `Analyst` (view + filter), `Admin` (full control).
-- **Dashboard Summary**: Real-time totals for income, expenses, and net balance.
-- **Monthly Trends**: Aggregated side-by-side comparison of monthly income vs. expenses.
-- **Category Breakdown**: Automatic grouping of spending by category.
-- **Advanced Controls**: Soft delete and search system for records.
-- **Admin Panel**: Role management and permanent account deletion.
-
-## 📡 API Endpoints
-
-### Authentication
-- `POST /api/auth/register`: Create new account
-- `POST /api/auth/login`: Authenticate and receive token
-- `GET /api/auth`: List users (Admin only)
-- `PUT /api/auth/:id`: Update user role/status (Admin only)
-- `DELETE /api/auth/:id`: Permanent user removal (Admin only)
-
-### Financial Records
-- `GET /api/records`: List records with pagination and search
-- `POST /api/records`: Add new record (Admin only)
-- `PUT /api/records/:id`: Edit record (Admin only)
-- `DELETE /api/records/:id`: Soft delete record (Admin only)
-
-### Dashboard Summaries
-- `GET /api/dashboard/summary`: Aggregated dashboard data
-
-## 🧠 Technical Assumptions
-
-- **Currency**: USD formatting used for all amounts.
-- **Predefined Categories**: Using a fixed list (Salary, Food, Rent, etc.) for data consistency.
-- **Soft Delete**: Default deletion of records preserves data integrity for auditing.
-
-## ⚙️ Technical Decisions and Trade-offs
-
-### 🛠️ Framework & Technology Choice
-- **Frontend (React + Vite)**: Chosen for its exceptional speed and developer experience. Compared to Create React App (CRA), **Vite** offers significantly faster build times and Hot Module Replacement (HMR).
-- **Backend (Node.js + Express)**: A lightweight, non-blocking foundation that is perfect for real-time dashboards and JSON-heavy APIs.
-- **Trade-off**: While Next.js could provide Server Side Rendering (SSR), it was passed over for a **Vite SPA** (Single Page App) to keep the frontend/backend decoupled, making it easier to deploy the backend to serverless platforms in the future.
-
-### 🗄️ Database Strategy (MongoDB + Mongoose)
-- **Choice**: Document-oriented NoSQL.
-- **Why**: Financial records can vary (additional meta-data, tags, etc.). MongoDB's flexible schema allows the app to evolve without complex SQL migrations.
-- **Trade-off**: SQL would provide better transactional integrity (ACID), but for a personal finance dashboard, the **speed and flexibility** of MongoDB outweigh the need for strict relational constraints.
-
-### 🔐 Authentication Approach (JWT)
-- **Choice**: Stateless JWT (JSON Web Tokens).
-- **Why**: Simplifies deployment and scaling as the server does not need to store session data. It is the modern standard for secure, decoupled API communication.
-- **Trade-off**: JWTs cannot be easily "revoked" before they expire. To mitigate this, I implemented an **account status ('inactive')** check on every request to ensure deactivated users are instantly blocked.
-
-### 🏗️ Project Architecture
-- **Pattern**: Controller-Route-Middleware.
-- **Why**: Clean separation of concerns.
-  - **Routes**: Define endpoints.
-  - **Controllers**: Handle business logic.
-  - **Middleware**: Manages reusable cross-cutting concerns (Auth, Validation, Error Handling).
-- **Trade-off**: For a small app, this adds more files, but it ensures the project remains **maintainable and testable** as it grows.
+*   🔒 **Robust Authentication**: Secure JWT-based login and registration with Bcrypt password hashing.
+*   🛡️ **Role-Based Access Control (RBAC)**: Three distinct roles: 
+    *   `Viewer` (Read-only access)
+    *   `Analyst` (View & Filter access)
+    *   `Admin` (Full control, User Management)
+*   📈 **Real-Time Dashboard**: Visual summaries showing totals for income, expenses, and net balance instantly.
+*   📊 **Visual Analytics**: Interactive charts (powered by Chart.js) for monthly comparisons and category breakdowns.
+*   🏷️ **Smart Categorization**: Automatic grouping of spending by predefined categories (Salary, Food, Rent, etc.).
+*   🔍 **Advanced Search & Filtering**: easily find specific records with an advanced soft-delete system keeping audit trails clean.
+*   👥 **Admin Panel**: Full dashboard for managing user access and roles.
 
 ---
 
-### 💡 Final Considerations
-- **Soft Delete**: Records are never hard-deleted; they are flagged (`isDeleted: true`). This maintains financial auditability while allowing a "Restore" feature in the future.
-- **Server-side Aggregation**: Calculations for "Monthly Trends" are handled by MongoDB aggregation pipelines. This offloads heavy processing from the client’s browser to the server.
+## 🛠️ Tech Stack
+
+### Frontend
+| Technology | Description |
+| :--- | :--- |
+| **React** (v19) | Component-based UI library for dynamic rendering. |
+| **Vite** (v5) | Blazing fast build tool and development server. |
+| **React Router** | Client-side routing for seamless navigation. |
+| **Chart.js** | Interactive and responsive charting. |
+| **Axios** | Promise-based HTTP client for API requests. |
+
+### Backend
+| Technology | Description |
+| :--- | :--- |
+| **Node.js** | Scalable javascript runtime environment. |
+| **Express** (v5) | Minimalist web framework for API endpoints. |
+| **MongoDB** | Highly flexible NoSQL database. |
+| **Mongoose** | Elegant MongoDB object modeling for Node.js. |
+| **JWT & Bcrypt** | Industry-standard authentication and password hashing. |
+
+---
+
+## 📡 API Endpoints
+
+### 🔐 Authentication (`/api/auth`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/register` | Register a new user account | Public |
+| `POST` | `/login` | Authenticate user and receive JWT token | Public |
+| `GET` | `/` | Fetch all registered users | **Admin** |
+| `PUT` | `/:id` | Update user role or account status | **Admin** |
+| `DELETE`| `/:id` | Permanently delete a user account | **Admin** |
+
+### 💰 Financial Records (`/api/records`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | List records (supports search & pagination) | All |
+| `POST` | `/` | Add a new financial record | **Admin** |
+| `PUT` | `/:id` | Update/Edit an existing record | **Admin** |
+| `DELETE`| `/:id` | Soft delete a record (Audit preserved) | **Admin** |
+
+### 📈 Dashboard (`/api/dashboard`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/summary` | Retrieve aggregated dashboard summary data | All |
+
+---
+
+## 🚀 Setup Instructions
+
+### 1. Backend Initialization
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the `backend` folder:
+   ```env
+   PORT=5000
+   MONGODB_URI=<YOUR_MONGODB_URI>
+   JWT_SECRET=<YOUR_JWT_SECRET>
+   ```
+4. Start the backend server:
+   ```bash
+   npm start
+   ```
+
+### 2. Frontend Initialization
+1. Open a new terminal and navigate to the frontend:
+   ```bash
+   cd frontend
+   ```
+2. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🧠 Technical Architecture & Trade-offs
+
+*   **Vite over Next.js**: Chosen for its exceptional speed and developer experience as a Vite SPA (Single Page App). Keeps the frontend and backend strictly decoupled.
+*   **MongoDB over SQL**: Chosen for the agile nature of financial record tracking, allowing the schema to evolve easily without complex SQL migrations.
+*   **Stateless JWT Authentication**: Used over session cookies to enable easy horizontal scaling of the Node backend.
+*   **Pipeline Aggregation**: Complex dashboard metrics are crunched via MongoDB pipelines directly on the server, significantly boosting client-side performance.
+*   **Audit-Ready Soft Deletion**: Records are flagged (`isDeleted: true`) rather than eradicated, maintaining financial auditability.
